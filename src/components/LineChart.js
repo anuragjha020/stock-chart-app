@@ -1,0 +1,123 @@
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { useEffect, useState } from "react";
+
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+function LineChart() {
+  const [chartData, setChartData] = useState(null);
+  const [timeframe, setTimeframe] = useState("1month"); // Default timeframe
+
+  const apiKey = "8a6946ba09d64bb19f49e3dd36b120ad";
+  const symbol = "AAPL"; // Example stock symbol
+
+  // Function to get interval and output size based on timeframe
+  const getIntervalAndSize = (timeframe) => {
+    switch (timeframe) {
+      case "1week":
+        return { interval: "1day", outputSize: "7" }; // Last 7 days
+      case "1month":
+        return { interval: "1day", outputSize: "30" }; // Last 30 days
+      case "1year":
+        return { interval: "1month", outputSize: "12" }; // Last 12 months
+      default:
+        return { interval: "1day", outputSize: "30" }; // Default: 1 month
+    }
+  };
+
+  // Convert datetime to weekday or month name
+  const formatLabels = (data, timeframe) => {
+    return data
+      .map((entry) => {
+        const date = new Date(entry.datetime);
+        if (timeframe === "1week") {
+          return date.toLocaleDateString("en-US", { weekday: "long" });
+        } else if (timeframe === "1month") {
+          return date.getDate();
+        } else {
+          return date.toLocaleDateString("en-US", { month: "long" });
+        }
+      })
+      .reverse();
+  };
+
+  useEffect(() => {
+    const fetchStockData = async () => {
+      try {
+        const { interval, outputSize } = getIntervalAndSize(timeframe);
+        const response = await fetch(
+          `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputSize}&apikey=${apiKey}`
+        );
+        const data = await response.json();
+        console.log(`Line chart data for ${timeframe}:`, data);
+
+        if (data.values) {
+          const labels = formatLabels(data.values, timeframe);
+          const prices = data.values
+            .map((entry) => parseFloat(entry.close))
+            .reverse();
+
+          setChartData({
+            labels,
+            datasets: [
+              {
+                label: `${symbol} Stock Price`,
+                data: prices,
+                backgroundColor: "rgba(54, 162, 235, 0.5)",
+                borderColor: "rgba(54, 162, 235, 1)",
+                borderWidth: 2,
+              },
+            ],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching stock data:", error);
+      }
+    };
+
+    fetchStockData();
+  }, [timeframe]);
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: { display: true },
+    },
+  };
+
+  return (
+    <div>
+      <h2>Line Chart</h2>
+      <div>
+        <button onClick={() => setTimeframe("1week")}>1 Week</button>
+        <button onClick={() => setTimeframe("1month")}>1 Month</button>
+        <button onClick={() => setTimeframe("1year")}>1 Year</button>
+      </div>
+      {chartData ? (
+        <Line options={options} data={chartData} />
+      ) : (
+        <p>Loading chart...</p>
+      )}
+    </div>
+  );
+}
+
+export default LineChart;
