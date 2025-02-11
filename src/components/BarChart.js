@@ -22,7 +22,7 @@ ChartJS.register(
 
 function BarChart() {
   const [chartData, setChartData] = useState(null);
-  const [timeframe, setTimeframe] = useState("1week");
+  const [timeframe, setTimeframe] = useState("1day");
   const [maxPrice, setMaxPrice] = useState(null);
   const [minPrice, setMinPrice] = useState(null);
 
@@ -32,6 +32,8 @@ function BarChart() {
   // Function to determine interval and output size
   const getIntervalAndSize = (timeframe) => {
     switch (timeframe) {
+      case "1day":
+        return { interval: "1h", outputSize: "7" };
       case "1week":
         return { interval: "1day", outputSize: "7" }; // Last 7 days
       case "1month":
@@ -48,8 +50,16 @@ function BarChart() {
     return data
       .map((entry) => {
         const date = new Date(entry.datetime);
-        if (timeframe === "1week") {
-          return date.toLocaleDateString("en-US", { day: "numeric", month: "short" });
+        if (timeframe === "1day") {
+          return date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+        } else if (timeframe === "1week") {
+          return date.toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+          });
         } else if (timeframe === "1month") {
           return date.toLocaleDateString("en-US", {
             day: "numeric",
@@ -121,6 +131,14 @@ function BarChart() {
       <div className="btn-group" role="group" aria-label="Timeframe Selector">
         <button
           className={`btn btn-sm btn-outline-secondary ${
+            timeframe === "1day" ? "active" : ""
+          }`}
+          onClick={() => setTimeframe("1day")}
+        >
+          Day
+        </button>
+        <button
+          className={`btn btn-sm btn-outline-secondary ${
             timeframe === "1week" ? "active" : ""
           }`}
           onClick={() => setTimeframe("1week")}
@@ -157,7 +175,9 @@ function BarChart() {
                     ? " of this year "
                     : timeframe === "1month"
                     ? " of this month "
-                    : " of this week "}
+                    : timeframe === "1week"
+                    ? " of this week "
+                    : " of today "}
                   is <strong className="text-success">{maxPrice}</strong>
                 </p>
               )}
@@ -169,7 +189,9 @@ function BarChart() {
                     ? " of this year "
                     : timeframe === "1month"
                     ? " of this month "
-                    : " of this week "}
+                    : timeframe === "1week"
+                    ? " of this week "
+                    : " of today "}
                   is <strong className="text-danger">{minPrice}</strong>
                 </p>
               )}
