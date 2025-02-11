@@ -1,6 +1,6 @@
+import { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
-import { useEffect, useState } from "react";
 
 // Register ChartJS components
 ChartJS.register(ArcElement, Tooltip, Legend, Title);
@@ -97,24 +97,29 @@ function PieChart() {
     fetchStockData();
   }, [timeframe]);
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" },
-      title: { display: true, text: "Stock Price Distribution" },
-    },
-  };
-
   return (
     <div>
-      <h2>Pie Chart</h2>
-      <div>
-        <button onClick={() => setTimeframe("1week")}>1 Week</button>
-        <button onClick={() => setTimeframe("1year")}>1 Year</button>
+      <div className="btn-group" role="group" aria-label="Timeframe Selector">
+        <button
+          className={`btn btn-sm btn-outline-secondary ${
+            timeframe === "1week" ? "active" : ""
+          }`}
+          onClick={() => setTimeframe("1week")}
+        >
+          1 Week
+        </button>
+        <button
+          className={`btn btn-sm btn-outline-secondary ${
+            timeframe === "1year" ? "active" : ""
+          }`}
+          onClick={() => setTimeframe("1year")}
+        >
+          1 Year
+        </button>
       </div>
       {chartData ? (
         <>
-          <Pie options={options} data={chartData} />
+          <Pie data={chartData} />
           {(maxPrice !== null || minPrice !== null) && (
             <div className="alert alert-info text-center p-3 mt-4 rounded shadow">
               {maxPrice !== null && (

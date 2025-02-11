@@ -5,24 +5,39 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 function App() {
   return (
-    <div className="container mt-4">
-      <h1 className="text-center mb-4 font-weight-bold text-white bg-primary p-3">
+    <div className="container mt-5 ">
+      {/* App Heading */}
+      <h1 className="text-center mb-5 font-weight-bold text-white bg-primary p-4 rounded">
         Stock Chart App
       </h1>
-      <div className="row">
-        {/* Pie chart on the left side */}
-        <div className="col-md-4">
-          <PieChart />
-        </div>
 
-        {/* Line chart and Bar chart on the right side, vertically stacked */}
-        <div className="col-md-8">
-          <div className="row">
-            <div className="col-12 mb-4">
+      {/* Row for Bar and Line Charts */}
+      <div className="row mb-5">
+        <div className="col-md-6 ">
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h4 className="card-title text-center mb-4">Bar Chart</h4>
+              <BarChart />
+            </div>
+          </div>
+        </div>
+        <div className="col-md-6 ">
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h4 className="card-title text-center mb-4">Line Chart</h4>
               <LineChart />
             </div>
-            <div className="col-12">
-              <BarChart />
+          </div>
+        </div>
+      </div>
+
+      {/* Row for Pie Chart */}
+      <div className="row mb-3 justify-content-center">
+        <div className="col-6">
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h4 className="card-title text-center mb-4">Pie Chart</h4>
+              <PieChart />
             </div>
           </div>
         </div>

@@ -68,28 +68,37 @@ function LineChart() {
         const response = await fetch(
           `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputSize}&apikey=${apiKey}`
         );
-        const data = await response.json();
-        console.log(`Line chart data for ${timeframe}:`, data);
+        const data = (await response.json()).values;
 
-        if (data.values) {
-          const labels = formatLabels(data.values, timeframe);
-          const prices = data.values
-            .map((entry) => parseFloat(entry.close))
+        if (data) {
+          const labels = formatLabels(data, timeframe);
+          const UpPrices = data
+            .map((entry) => parseFloat(entry.high))
+            .reverse();
+          const LowPrices = data
+            .map((entry) => parseFloat(entry.low))
             .reverse();
 
-          const maxPrice = Math.max(...prices).toFixed(2);
+          const maxPrice = Math.max(...UpPrices).toFixed(2);
           setMaxPrice(maxPrice);
-          const minPrice = Math.min(...prices).toFixed(2);
+          const minPrice = Math.min(...LowPrices).toFixed(2);
           setMinPrice(minPrice);
 
           setChartData({
             labels,
             datasets: [
               {
-                label: `${symbol} Stock Price`,
-                data: prices,
+                label: `${symbol} High Price`,
+                data: UpPrices,
                 backgroundColor: "rgba(54, 162, 235, 0.5)",
                 borderColor: "rgba(54, 162, 235, 1)",
+                borderWidth: 2,
+              },
+              {
+                label: `${symbol} Low Price`,
+                data: LowPrices,
+                backgroundColor: "rgba(255, 99, 132, 0.5)",
+                borderColor: "rgba(255, 99, 132, 1)",
                 borderWidth: 2,
               },
             ],
@@ -103,24 +112,37 @@ function LineChart() {
     fetchStockData();
   }, [timeframe]);
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { display: true },
-    },
-  };
-
   return (
     <div>
-      <h2>Line Chart</h2>
-      <div>
-        <button onClick={() => setTimeframe("1week")}>1 Week</button>
-        <button onClick={() => setTimeframe("1month")}>1 Month</button>
-        <button onClick={() => setTimeframe("1year")}>1 Year</button>
+      <div className="btn-group" role="group" aria-label="Timeframe Selector">
+        <button
+          className={`btn btn-sm btn-outline-secondary ${
+            timeframe === "1week" ? "active" : ""
+          }`}
+          onClick={() => setTimeframe("1week")}
+        >
+          1 Week
+        </button>
+        <button
+          className={`btn btn-sm btn-outline-secondary ${
+            timeframe === "1month" ? "active" : ""
+          }`}
+          onClick={() => setTimeframe("1month")}
+        >
+          1 Month
+        </button>
+        <button
+          className={`btn btn-sm btn-outline-secondary ${
+            timeframe === "1year" ? "active" : ""
+          }`}
+          onClick={() => setTimeframe("1year")}
+        >
+          1 Year
+        </button>
       </div>
       {chartData ? (
         <>
-          <Line options={options} data={chartData} />
+          <Line data={chartData} />
           {(maxPrice !== null || minPrice !== null) && (
             <div className="alert alert-info text-center p-3 mt-4 rounded shadow">
               {maxPrice !== null && (
