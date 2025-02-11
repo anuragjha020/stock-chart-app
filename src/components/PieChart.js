@@ -12,7 +12,7 @@ function PieChart() {
   const [minPrice, setMinPrice] = useState(null);
 
   const apiKey = "8a6946ba09d64bb19f49e3dd36b120ad";
-  const symbol = "USD";
+  const symbol = "AAPL";
 
   // Function to determine interval and output size
   const getIntervalAndSize = (timeframe) => {
@@ -32,9 +32,12 @@ function PieChart() {
       .map((entry) => {
         const date = new Date(entry.datetime);
         if (timeframe === "1week") {
-          return date.toLocaleDateString("en-US", { weekday: "long" });
+          return date.toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+          });
         } else {
-          return date.toLocaleDateString("en-US", { month: "long" });
+          return date.toLocaleDateString("en-US", { month: "short" });
         }
       })
       .reverse();
@@ -106,7 +109,7 @@ function PieChart() {
           }`}
           onClick={() => setTimeframe("1week")}
         >
-          1 Week
+          Week
         </button>
         <button
           className={`btn btn-sm btn-outline-secondary ${
@@ -114,7 +117,7 @@ function PieChart() {
           }`}
           onClick={() => setTimeframe("1year")}
         >
-          1 Year
+          Year
         </button>
       </div>
       {chartData ? (

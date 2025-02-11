@@ -49,11 +49,14 @@ function BarChart() {
       .map((entry) => {
         const date = new Date(entry.datetime);
         if (timeframe === "1week") {
-          return date.toLocaleDateString("en-US", { weekday: "long" });
+          return date.toLocaleDateString("en-US", { day: "numeric", month: "short" });
         } else if (timeframe === "1month") {
-          return date.getDate();
+          return date.toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+          });
         } else {
-          return date.toLocaleDateString("en-US", { month: "long" });
+          return date.toLocaleDateString("en-US", { month: "short" });
         }
       })
       .reverse();
@@ -122,7 +125,7 @@ function BarChart() {
           }`}
           onClick={() => setTimeframe("1week")}
         >
-          1 Week
+          Week
         </button>
         <button
           className={`btn btn-sm btn-outline-secondary ${
@@ -130,7 +133,7 @@ function BarChart() {
           }`}
           onClick={() => setTimeframe("1month")}
         >
-          1 Month
+          Month
         </button>
         <button
           className={`btn btn-sm btn-outline-secondary ${
@@ -138,7 +141,7 @@ function BarChart() {
           }`}
           onClick={() => setTimeframe("1year")}
         >
-          1 Year
+          Year
         </button>
       </div>
 
