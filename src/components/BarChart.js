@@ -22,10 +22,12 @@ ChartJS.register(
 
 function BarChart() {
   const [chartData, setChartData] = useState(null);
-  const [timeframe, setTimeframe] = useState("1month"); // Default: 1 Month
+  const [timeframe, setTimeframe] = useState("1week");
+  const [maxPrice, setMaxPrice] = useState(null);
+  const [minPrice, setMinPrice] = useState(null);
 
-  const apiKey = "8a6946ba09d64bb19f49e3dd36b120ad"; // Replace with your API key
-  const symbol = "AAPL"; // Example stock symbol
+  const apiKey = "8a6946ba09d64bb19f49e3dd36b120ad";
+  const symbol = "AAPL";
 
   // Function to determine interval and output size
   const getIntervalAndSize = (timeframe) => {
@@ -37,7 +39,7 @@ function BarChart() {
       case "1year":
         return { interval: "1month", outputSize: "12" }; // Last 12 months
       default:
-        return { interval: "1day", outputSize: "30" }; // Default: 1 month
+        return { interval: "1day", outputSize: "30" }; // Default 1 month
     }
   };
 
@@ -47,11 +49,11 @@ function BarChart() {
       .map((entry) => {
         const date = new Date(entry.datetime);
         if (timeframe === "1week") {
-          return date.toLocaleDateString("en-US", { weekday: "long" }); // e.g., Monday
-        } else if(timeframe === "1month"){
-          return date.getDate(); // e.g., January
-        } else{
-          return date.toLocaleDateString("en-US", { month: "long" }); // e.g., January
+          return date.toLocaleDateString("en-US", { weekday: "long" });
+        } else if (timeframe === "1month") {
+          return date.getDate();
+        } else {
+          return date.toLocaleDateString("en-US", { month: "long" });
         }
       })
       .reverse();
@@ -71,8 +73,14 @@ function BarChart() {
         if (data.values) {
           const labels = formatLabels(data.values, timeframe);
           const prices = data.values
-            .map((entry) => parseFloat(entry.close))
+            .map((entry) => parseFloat(entry.high))
             .reverse();
+
+          const maxPrice = Math.max(...prices).toFixed(2);
+          setMaxPrice(maxPrice);
+
+          const minPrice = Math.min(...prices).toFixed(2);
+          setMinPrice(minPrice);
 
           setChartData({
             labels,
@@ -111,8 +119,38 @@ function BarChart() {
         <button onClick={() => setTimeframe("1month")}>1 Month</button>
         <button onClick={() => setTimeframe("1year")}>1 Year</button>
       </div>
+
       {chartData ? (
-        <Bar options={options} data={chartData} />
+        <>
+          <Bar options={options} data={chartData} />
+          {(maxPrice !== null || minPrice !== null) && (
+            <div className="alert alert-info text-center p-3 mt-4 rounded shadow">
+              {maxPrice !== null && (
+                <p className="mb-1">
+                  📈 <strong>Highest Price</strong>
+                  {timeframe === "1year"
+                    ? " of this year "
+                    : timeframe === "1month"
+                    ? " of this month "
+                    : " of this week "}
+                  is <strong className="text-success">{maxPrice}</strong>
+                </p>
+              )}
+
+              {minPrice !== null && (
+                <p className="mb-0">
+                  📉 <strong>Lowest Price</strong>
+                  {timeframe === "1year"
+                    ? " of this year "
+                    : timeframe === "1month"
+                    ? " of this month "
+                    : " of this week "}
+                  is <strong className="text-danger">{minPrice}</strong>
+                </p>
+              )}
+            </div>
+          )}
+        </>
       ) : (
         <p>Loading data...</p>
       )}

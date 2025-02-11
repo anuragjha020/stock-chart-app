@@ -8,8 +8,10 @@ ChartJS.register(ArcElement, Tooltip, Legend, Title);
 function PieChart() {
   const [chartData, setChartData] = useState(null);
   const [timeframe, setTimeframe] = useState("1week");
+  const [maxPrice, setMaxPrice] = useState(null);
+  const [minPrice, setMinPrice] = useState(null);
 
-  const apiKey = "8a6946ba09d64bb19f49e3dd36b120ad"; 
+  const apiKey = "8a6946ba09d64bb19f49e3dd36b120ad";
   const symbol = "USD";
 
   // Function to determine interval and output size
@@ -30,9 +32,9 @@ function PieChart() {
       .map((entry) => {
         const date = new Date(entry.datetime);
         if (timeframe === "1week") {
-          return date.toLocaleDateString("en-US", { weekday: "long" }); // e.g., Monday
+          return date.toLocaleDateString("en-US", { weekday: "long" });
         } else {
-          return date.toLocaleDateString("en-US", { month: "long" }); // e.g., January
+          return date.toLocaleDateString("en-US", { month: "long" });
         }
       })
       .reverse();
@@ -54,6 +56,12 @@ function PieChart() {
           const prices = data.values
             .map((entry) => parseFloat(entry.close))
             .reverse();
+
+          const maxPrice = Math.max(...prices).toFixed(2);
+          setMaxPrice(maxPrice);
+
+          const minPrice = Math.min(...prices).toFixed(2);
+          setMinPrice(minPrice);
 
           setChartData({
             labels,
@@ -105,7 +113,28 @@ function PieChart() {
         <button onClick={() => setTimeframe("1year")}>1 Year</button>
       </div>
       {chartData ? (
-        <Pie options={options} data={chartData} />
+        <>
+          <Pie options={options} data={chartData} />
+          {(maxPrice !== null || minPrice !== null) && (
+            <div className="alert alert-info text-center p-3 mt-4 rounded shadow">
+              {maxPrice !== null && (
+                <p className="mb-1">
+                  📈 <strong>Highest Price</strong>
+                  {timeframe === "1year" ? " of this year " : " of this week "}
+                  is <strong className="text-success">{maxPrice}</strong>
+                </p>
+              )}
+
+              {minPrice !== null && (
+                <p className="mb-0">
+                  📉 <strong>Lowest Price</strong>
+                  {timeframe === "1year" ? " of this year " : " of this week "}
+                  is <strong className="text-danger">{minPrice}</strong>
+                </p>
+              )}
+            </div>
+          )}
+        </>
       ) : (
         <p>Loading data...</p>
       )}
