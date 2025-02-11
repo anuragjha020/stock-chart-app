@@ -45,7 +45,7 @@ function BarChart() {
     }
   };
 
-  // Convert datetime to weekday or month name
+  // formating datetime to time, date and month
   const formatLabels = (data, timeframe) => {
     return data
       .map((entry) => {
