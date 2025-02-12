@@ -33,11 +33,16 @@ function App() {
 
       {/* Row for Pie Chart */}
       <div className="row mb-3 justify-content-center">
-        <div className="col-6">
+        <div className="col-12">
           <div className="card shadow-sm">
-            <div className="card-body">
+            <div
+              className="card-body d-flex flex-column align-items-center"
+              style={{ height: "600px" }}
+            >
               <h4 className="card-title text-center mb-4">Pie Chart</h4>
-              <PieChart />
+              <div>
+                <PieChart />
+              </div>
             </div>
           </div>
         </div>

@@ -51,12 +51,14 @@ function PieChart() {
         const response = await fetch(
           `https://api.twelvedata.com/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputSize}&apikey=${apiKey}`
         );
-        const data = (await response.json()).values;
+        const data = await response.json();
         console.log("Pie Chart Data: ", data);
 
         if (data) {
-          const labels = formatLabels(data, timeframe);
-          const prices = data.map((entry) => parseFloat(entry.close)).reverse();
+          const labels = formatLabels(data.values, timeframe);
+          const prices = data.values
+            .map((entry) => parseFloat(entry.close))
+            .reverse();
 
           const maxPrice = Math.max(...prices).toFixed(2);
           setMaxPrice(maxPrice);
